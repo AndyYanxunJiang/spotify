@@ -13,13 +13,11 @@ library(readr)
 
 #### Download data ####
 radiohead <- get_artist_audio_features("radiohead")
-saveRDS(radiohead, "radiohead.rds")
-the_national <- get_artist_audio_features("the national")
+saveRDS(radiohead, "data/01-raw_data/radiohead.rds")
 
-saveRDS(the_national, "the_national.rds")
+coldplay <- get_artist_audio_features("coldplay")
+saveRDS(coldplay, "data/01-raw_data/coldplay.rds")
 
-
-#### Save data ####
-write_rds(radiohead, "data/01-raw_data/radiohead.rds") 
-
+beyonce <- get_artist_audio_features("beyonce")
+saveRDS(beyonce, "data/01-raw_data/beyonce.rds")
 

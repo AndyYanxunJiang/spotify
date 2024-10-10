@@ -19,176 +19,123 @@ bibliography: references.bib
 #| message: false
 
 library(tidyverse)
-library(palmerpenguins)
+library(spotifyr)
+library(lubridate)
+
+coldplay <- read_rds(here::here("data/01-raw_data/coldplay.rds"))
+beyonce <- get_artist_audio_features(here::here("data/01-raw_data/beyonce.rds"))
 ```
 
 
 # Introduction
 
-Overview paragraph
+In recent years, music streaming platforms have provided vast amounts of data that enable a deeper analysis of the characteristics of different artists’ music. By utilizing Spotify’s audio feature data, we can examine several aspects of a song such as duration, tempo, energy, and valence (a measure of musical positivity or happiness). In this analysis, we focus on two globally renowned artists, Beyoncé and Coldplay, to compare key audio features of their music over time.
 
-Estimand paragraph
-
-Results paragraph
-
-Why it matters paragraph
-
-Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
-
-
-
+This study examines the duration and valence of songs released by Beyoncé and Coldplay, offering insights into how these attributes vary between the two artists. The analysis is visualized through boxplots and scatter plots, helping to reveal trends in their musical style and production across different time periods. The results suggest that while Beyoncé’s music varies more in duration and has a higher valence (indicating happier music), Coldplay’s songs are generally more consistent in length, with less valence or happiness expressed in their tracks.
 
 
 
 # Data {#sec-data}
+We use the statistical programming language R [@citeR] and library [@citeSpotifyr]. We used [@ggplot2] to create the figures.
 
 ## Overview
+The key attributes of the data include:
 
-We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
-
-Overview text
-
-## Measurement
-	
-Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
-
-## Outcome variables
-
-Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
+Duration: Measured in milliseconds, this represents the length of each track.
+Valence: A measure from 0 to 1 indicating how happy or sad a track sounds. Higher values correspond to happier, more cheerful music, while lower values indicate sadness or melancholy.
+Album release date: The date when each album was released, which helps in analyzing trends over time.
+Using this dataset, we compared the two artists on two main dimensions: song duration and valence.
 
 
-
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
-
-```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
-#| echo: false
-
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
-```
-
-Talk more about it.
-
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
-
-```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
-#| echo: false
-#| warning: false
-#| message: false
-
-analysis_data <- read_csv(here::here("data/02-analysis_data/analysis_data.csv"))
-
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
-```
-
-Talk way more about it. 
-
-## Predictor variables
-
-Add graphs, tables and text.
-
-Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
-
-
-
-
-
-
-
-
-# Model
-
-The goal of our modelling strategy is twofold. Firstly,...
-
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
-
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
-
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
-
-
-### Model justification
-
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
-
-We can use maths by including latex between dollar signs, for instance $\theta$.
 
 
 # Results
-
-Our results are summarized in @tbl-modelresults.
+Our results are summarized in @fid-duration.
 
 ```{r}
+#| label: fig-duration
+#| fig-cap: duration of songs
 #| echo: false
-#| eval: true
+
+beyonce <- as_tibble(beyonce)
+
+beyonce |>
+  mutate(album_release_date = ymd(album_release_date)) |>
+  ggplot(aes(
+    x = album_release_date,
+    y = duration_ms,
+    group = album_release_date
+  )) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.5, width = 0.3, height = 0) +
+  theme_minimal() +
+  labs(
+    x = "Album release date",
+    y = "Duration of song (ms)"
+  )
+
+
+coldplay <- as_tibble(coldplay)
+
+coldplay |>
+  mutate(album_release_date = ymd(album_release_date)) |>
+  ggplot(aes(
+    x = album_release_date,
+    y = duration_ms,
+    group = album_release_date
+  )) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.5, width = 0.3, height = 0) +
+  theme_minimal() +
+  labs(
+    x = "Album release date",
+    y = "Duration of song (ms)"
+  )
+```
+
+```{r}
+#| label: fig-valence
+#| fig-cap: valence of artist songs
+#| echo: false
 #| warning: false
 #| message: false
 
-library(rstanarm)
-
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
+rbind(beyonce, coldplay) |>
+  select(artist_name, album_release_date, valence) |>
+  mutate(album_release_date = ymd(album_release_date)) |> 
+  ggplot(aes( x = album_release_date, y = valence, color = artist_name)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth() +
+  theme_minimal() +
+  facet_wrap(facets = vars(artist_name), dir = "v") +
+  labs(
+    x = "Album release date",
+    y = "Valence",
+    color = "Artist"
+  ) +
+  scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
 ```
 
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
+## Song Duration
+	
+The first two plots (Figures 1 and 2) provide boxplots of song durations for Beyoncé and Coldplay over time. Several interesting observations can be made from these visualizations:
 
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
-)
-```
+Beyoncé: The song duration for Beyoncé shows a wider range across the years, indicating a greater variability in how long her songs tend to be. Some of her albums contain shorter tracks, while others include significantly longer ones. This suggests that Beyoncé experiments more with song length, perhaps catering to different album concepts or genres.
 
+Coldplay: On the other hand, Coldplay’s songs tend to be more consistent in duration, with less variation in length. While there are a few outliers with exceptionally long or short tracks, most of Coldplay’s songs stay within a narrower duration range. This may reflect Coldplay’s commitment to a particular style or format for their music.
 
+## Valence
+
+The third plot (Figure 3) shows the valence, or happiness, of songs by Beyoncé and Coldplay over time. This is where the two artists differ most notably:
+
+Beyoncé: Her songs have generally higher valence scores, meaning that her music tends to sound more upbeat, positive, and emotionally vibrant. This aligns with the perception of Beyoncé’s music, which often conveys themes of empowerment, celebration, and joy.
+
+Coldplay: Coldplay’s music, in contrast, exhibits lower valence scores, suggesting a more melancholic or introspective tone. Coldplay is known for producing emotionally resonant tracks, often focusing on themes of love, loss, and reflection, which could explain the lower valence values.
 
 
-# Discussion
 
-## First discussion point {#sec-first-point}
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
-
-## Second discussion point
-
-Please don't use these as sub-heading labels - change them to be what your point actually is.
-
-## Third discussion point
-
-## Weaknesses and next steps
-
-Weaknesses and next steps should also be included.
 
 \newpage
 
@@ -196,58 +143,6 @@ Weaknesses and next steps should also be included.
 
 # Appendix {-}
 
-
-# Additional data details
-
-# Model details {#sec-model-details}
-
-## Posterior predictive check
-
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
-
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
-
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
-```
-
-## Diagnostics
-
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
-
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
-
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
-
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
-```
 
 
 
