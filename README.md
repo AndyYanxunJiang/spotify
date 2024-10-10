@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repo analyzes data from Spotify to ompare and contrast the differing music trend (valence and duration) of two artists. 
+This paper analyzes the audio features of songs from two globally renowned artists, Beyoncé and Coldplay, using Spotify's API. By focusing on song duration and valence (musical positivity), the study compares trends in their music over time. The results show that Beyoncé's songs vary more in length and tend to have higher valence, while Coldplay's tracks are more consistent in duration but exhibit a more melancholic tone.
 
 ## File Structure
 
